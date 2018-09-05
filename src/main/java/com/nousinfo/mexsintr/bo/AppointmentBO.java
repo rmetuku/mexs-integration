@@ -5,6 +5,7 @@ package com.nousinfo.mexsintr.bo;
 
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -23,10 +24,10 @@ public class AppointmentBO {
 	private String subject;
 	private String body;
 	@ApiModelProperty(example="yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="IST")
 	private Date startTime;
 	@ApiModelProperty(example="yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="IST")
 	private Date endTime;
 	private List<String> attendees;
 
