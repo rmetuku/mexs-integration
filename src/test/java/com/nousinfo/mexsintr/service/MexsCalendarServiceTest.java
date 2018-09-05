@@ -66,5 +66,9 @@ public class MexsCalendarServiceTest {
 	public void getMeetingInvitationStatus() throws Exception {
 		service.getMeetingInvitationStatus("Id********");
 	}
+	
+	public void updateAppointment() {
+		
+	}
 
 }
