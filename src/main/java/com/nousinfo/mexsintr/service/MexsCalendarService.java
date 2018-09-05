@@ -3,19 +3,22 @@
  */
 package com.nousinfo.mexsintr.service;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.nousinfo.mexsintr.bo.AppointmentBO;
+import com.nousinfo.mexsintr.bo.AppointmentUpdateBO;
 import com.nousinfo.mexsintr.bo.AttendeeAvailabilityBO;
 import com.nousinfo.mexsintr.bo.AttendeeAvailabilityResponseBO;
 import com.nousinfo.mexsintr.bo.EmailMessageBO;
@@ -139,11 +142,13 @@ public class MexsCalendarService {
 	 * @param appointmentBO
 	 * @throws Exception
 	 */
-	public String createAppointment(AppointmentBO appointmentBO, String filePath) throws Exception {
+	public String createAppointment(AppointmentBO appointmentBO, MultipartFile... attachments) throws Exception {
 		Appointment appointment = createAppointment(appointmentBO);
 		System.out.println("AppId: " + appointment.getId().toString());
-		if (null != filePath) {
-			appointment.getAttachments().addFileAttachment("D:\\Fitch\\SPE-CS5-Java.pdf");
+		if (null != attachments && attachments.length > 0) {
+			for (MultipartFile file : attachments) {
+				appointment.getAttachments().addFileAttachment(file.getOriginalFilename(), file.getInputStream());
+			}
 		}
 		for (String attendee : appointmentBO.getAttendees()) {
 			appointment.getRequiredAttendees().add(attendee);
@@ -192,6 +197,44 @@ public class MexsCalendarService {
 
 		}
 		return attendeeStatus;
+	}
+
+	/**
+	 * @param appointmentUpdateBO
+	 * @throws Exception
+	 */
+	public String updateAppointment(AppointmentUpdateBO appointmentUpdateBO) throws Exception {
+		Appointment appointment = Appointment.bind(service, new ItemId(appointmentUpdateBO.getMeetingId()));
+		if (appointmentUpdateBO.getStartTime() != null) {
+			appointment.setStart(appointmentUpdateBO.getStartTime());
+		}
+		if (appointmentUpdateBO.getEndTime() != null) {
+			appointment.setEnd(appointmentUpdateBO.getEndTime());
+		}
+		if (!CollectionUtils.isEmpty(appointmentUpdateBO.getAttendees())) {
+			for (String attendee : appointmentUpdateBO.getAttendees()) {
+				appointment.getRequiredAttendees().add(attendee);
+			}
+
+		}
+		if (!StringUtils.isEmpty(appointmentUpdateBO.getSubject())) {
+			appointment.setSubject(appointmentUpdateBO.getSubject());
+		}
+		if (!StringUtils.isEmpty(appointmentUpdateBO.getBody())) {
+			appointment.setBody(MessageBody.getMessageBodyFromText(appointmentUpdateBO.getBody()));
+		}
+		appointment.update(ConflictResolutionMode.AutoResolve);
+		return appointment.getId().toString();
+	}
+
+	/**
+	 * @param meetingId
+	 * @param cancellationMessage
+	 * @throws Exception
+	 */
+	public void cancelAppointment(String meetingId, String cancellationMessage) throws Exception {
+		Appointment appointment = Appointment.bind(service, new ItemId(meetingId));
+		appointment.cancelMeeting(cancellationMessage);
 	}
 
 	/**

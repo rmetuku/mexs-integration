@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class AttendeeAvailabilityBO {
 
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@ApiModelProperty(example="yyyy-MM-dd HH:mm:ss")
 	private Date startTime;
 	@ApiModelProperty(example="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")

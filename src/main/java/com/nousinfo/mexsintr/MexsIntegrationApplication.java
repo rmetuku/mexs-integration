@@ -6,6 +6,8 @@ import static springfox.documentation.builders.PathSelectors.regex;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.google.common.base.Predicate;
 
@@ -35,6 +37,11 @@ public class MexsIntegrationApplication {
 	@SuppressWarnings({ "unchecked" })
 	private Predicate<String> paths() {
 		return or(regex(API_PREFIX));
+	}
+
+	@Bean(name = "multipartResolver")
+	public MultipartResolver commonsMultipartResolver() {
+		return new CommonsMultipartResolver();
 	}
 
 }
